@@ -4,7 +4,8 @@
   "description": "① 新建项目空白目录，并运行 npm init –y 命令，初始化包管理配置文件 package.json",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack"
   },
   "repository": {
     "type": "git",
@@ -19,5 +20,9 @@
   "homepage": "https://github.com/zs-mcu/webpack-demo#readme",
   "dependencies": {
     "jquery": "^3.6.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.42.1",
+    "webpack-cli": "^4.7.2"
   }
 }
