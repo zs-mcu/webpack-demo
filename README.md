@@ -88,7 +88,7 @@ module.exports = {
   entry: path.join(__dirname,'./src/index.js'),
   output: {
     path: path.join(__dirname,'./dist'),
-    filename: 'bundle.js'
+    filename: 'bundle.js' //默认为main.js
   }
 }
 ```
@@ -96,4 +96,48 @@ module.exports = {
 
 
 
+
+**webpack 中的插件**
+
+
+
+**1. webpack 插件的作用**
+
+通过安装和配置第三方的插件，可以拓展 webpack 的能力，从而让 webpack 用起来更方便。最常用的
+
+webpack 插件有如下两个：
+
+① webpack-dev-server
+
+类似于 node.js 阶段用到的 nodemon 工具
+
+每当修改了源代码，webpack 会自动进行项目的打包和构建
+
+② html-webpack-plugin
+
+webpack 中的 HTML 插件（类似于一个模板引擎插件）
+
+可以通过此插件自定制 index.html 页面的内容
+
+
+
+**2.1 安装 webpack-dev-server**
+
+```npm install webpack-dev-server@3.11.2 -D```
+
+**2.2 配置 webpack-dev-server**
+
+① 修改 package.json -> scripts 中的 dev 命令如下：
+
+```
+"script": {
+"dev": "webpack serve",
+}
+```
+
+
+
+② 再次运行 npm run dev 命令，重新进行项目的打包
+
+③ 在浏览器中访问 http://localhost:8080 地址，查看自动打包效果
 
