@@ -141,3 +141,205 @@ webpack 中的 HTML 插件（类似于一个模板引擎插件）
 
 ③ 在浏览器中访问 http://localhost:8080 地址，查看自动打包效果
 
+
+
+
+
+**3.1 安装 html-webpack-plugin**
+
+```npm install html-webpack-plugin@5.3.2 -D```
+
+
+
+**3.2 配置 html-webpack-plugin**
+
+```js
+// 1.导入HTML插件，得到一个构造函数
+const HtmlPlugin = require('html-webpack-plugin')
+
+// 2. 创建HTML 插件的实例对象
+const htmlPlugin = new HtmlPlugin({
+  template: './src/index.html',
+  filename: './index.html',
+})
+
+
+module.exports = {
+  mode: 'development',
+  plugins: [htmlPlugin]
+}
+
+```
+
+
+
+
+
+**4. devServer 节点**
+
+在 webpack.config.js 配置文件中，可以通过 devServer 节点对 webpack-dev-server 插件进行更多的配置，
+
+示例代码如下：
+
+```j
+devServer:{
+	open: true,
+	host: '127.0.0.1',
+	port: 80
+}
+```
+
+
+
+**webpack 中的 loader**
+
+webpack默认只能打包处理.js文件，处理不了其他后缀的文件
+
+**3. 打包处理 css 文件**
+
+① 运行 npm i style-loader@3.0.0 css-loader@5.2.6 -D 命令，安装处理 css 文件的 loader
+
+② 在 webpack.config.js 的 module -> rules 数组中，添加 loader 规则如下：
+
+```js
+module: {
+  rules: [
+    //前后顺序不能反，loader调用的时候是从后往前调用的
+    {test: /\.css$/,use:['style-loader','css-loader']}
+  ]
+}
+```
+
+webpack -->css --> css loader --> style loader
+
+
+
+
+
+**4. 打包处理 less 文件**
+
+① 运行 npm i less-loader@10.0.1 less@4.1.1 -D 命令     //less-loader 内部依赖于less
+
+② 在 webpack.config.js 的 module -> rules 数组中，添加 loader 规则如下：
+
+
+
+```js
+module: {
+  rules: [
+    {tests: /\.less/,use:['style-loader',css-loader,'less-loader']}
+  ]
+}
+```
+
+
+
+**5. 打包处理样式表中与** **url 路径相关****的文件**
+
+① 运行 npm i url-loader@4.1.1 file-loader@6.2.0 -D 命令
+
+② 在 webpack.config.js 的 module -> rules 数组中，添加 loader 规则如下：
+
+```js
+    module: {
+        rules: [
+            {test: /\.jpg|png|gif$/ , use:'url-loader?limit=22229'}
+          ]
+    }
+```
+
+
+
+其中 ? 之后的是 loader 的参数项： 
+
+⚫ limit 用来指定图片的大小，单位是字节（byte） 
+
+⚫ 只有 ≤ limit 大小的图片，才会被转为 base64 格式的图片
+
+
+
+**6. 打包处理 js 文件中的高级语法**
+
+webpack 只能打包处理一部分高级的 JavaScript 语法。对于那些 webpack 无法处理的高级 js 语法，需要借
+
+助于 babel-loader 进行打包处理。例如 webpack 无法处理下面的 JavaScript 代码：
+
+```js
+//定义名为info的装饰器
+function info(target){
+  //为目标加静态属性 info
+  target.info = 'Person info'
+}
+
+// 为 Person 类应用info装饰器
+@info
+class Person{}
+
+// 打印 Person 的静态属性 info
+console.log(Person.info)
+```
+
+**6.1 安装 babel-loader 相关的包**
+
+npm i babel-loader@8.2.2 @babel/core@7.14.6 @babel/plugin-proposal-decorators@7.14.5 -D 
+
+在 webpack.config.js 的 module -> rules 数组中，添加 loader 规则如下：
+
+```js
+{test: /\.js$/ , use:'babel-loader',exclude: /node_modules/},
+```
+
+
+
+https://babeljs.io/docs/en/babel-plugin-transform-runtime
+
+在项目根目录下，创建名为 babel.config.js 的配置文件，定义 Babel 的配置项如下
+
+```js
+module.exports = {
+    
+    plugins: [['@babel/plugin-proposal-decorators',{legacy: true}]]
+}
+```
+
+
+
+
+
+
+
+
+
+**打包发布**
+
+**2. 配置 webpack 的打包发布**
+
+在 package.json 文件的 scripts 节点下，新增 build 命令如下：
+
+```json
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack serve",
+    "build": "webpack --mode production"
+  },
+```
+
+--model 是一个参数项，用来指定 webpack 的运行模式。production 代表生产环境，会对打包生成的文件
+
+进行代码压缩和性能优化。
+
+注意：通过 --model 指定的参数项，会覆盖 webpack.config.js 中的 model 选项。
+
+
+
+
+
+**3. 把 JavaScript 文件统一生成到 js 目录中**
+
+在 webpack.config.js 配置文件的 output 节点中，进行如下的配置：
+
+
+
+**4. 把图片文件统一生成到 image 目录中**
+
+修改 webpack.config.js 中的 url-loader 配置项，新增 outputPath 选项即可指定图片文件的输出路径：
