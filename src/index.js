@@ -34,4 +34,5 @@ function info(target){
   class Person{}
   
   // 打印 Person 的静态属性 info
-  console.log(Person.info)
+  conole.log(Person.info)
+

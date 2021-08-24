@@ -119,6 +119,38 @@ webpack 中的 HTML 插件（类似于一个模板引擎插件）
 
 可以通过此插件自定制 index.html 页面的内容
 
+```js
+const path = require('path')// 导入 node.js 中专门操作路径的模块
+
+  
+module.exports = {
+    mode: 'production', // mode 用来指定构建模式。 可选值有 development 和 production
+    //development : 开发使用，打包速度快
+    //production: 上线时使用
+    entry: path.join(__dirname,'./src/index.js'),
+    output:{
+        path: path.join(__dirname,'dist'),
+        filename: 'js/main.js'
+    },
+    plugins: [htmlPlugin],
+    devServer: {
+        open: true,
+        port: 8081,
+        host: '127.0.0.1',
+
+
+    },
+    module: {
+        rules: [
+            {test: /\.css$/ , use:['style-loader','css-loader']},
+            {test: /\.less$/ , use:['style-loader','css-loader','less-loader']},
+            {test: /\.jpg|png|gif$/ , use:'url-loader?limit=300&outputPath=images'},
+            {test: /\.js$/ , use:'babel-loader',exclude: /node_modules/}
+          ]
+    }
+}
+```
+
 
 
 **2.1 安装 webpack-dev-server**
@@ -338,8 +370,101 @@ module.exports = {
 
 在 webpack.config.js 配置文件的 output 节点中，进行如下的配置：
 
+```js
+  
+const path = require('path')//导入 node.js 中专门操作路径的模块
+module.exports = {
+	output:{
+        path: path.join(__dirname,'dist'),
+        filename: 'js/main.js'
+    },
+}
+```
+
 
 
 **4. 把图片文件统一生成到 image 目录中**
 
 修改 webpack.config.js 中的 url-loader 配置项，新增 outputPath 选项即可指定图片文件的输出路径：
+```js
+{test: /\.jpg|png|gif$/ , use:'url-loader?limit=300&outputPath=images'},
+  
+{test: /\.jpg|png|gif$/ , use:{loader: 'url-loader',options:{limit=300,outputPath='images'}}},
+```
+
+**5. 自动清理 dist 目录下的旧文件**
+
+为了在每次打包发布时自动清理掉 dist 目录中的旧文件，可以安装并配置 clean-webpack-plugin 插件
+
+```js
+npm install --save-dev clean-webpack-plugin
+
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+const webpackConfig = {
+    plugins: [
+        /**
+         * All files inside webpack's output.path directory will be removed once, but the
+         * directory itself will not be. If using webpack 4+'s default configuration,
+         * everything under <PROJECT_DIR>/dist/ will be removed.
+         * Use cleanOnceBeforeBuildPatterns to override this behavior.
+         *
+         * During rebuilds, all webpack assets that are not used anymore
+         * will be removed automatically.
+         *
+         * See `Options and Defaults` for information
+         */
+        new CleanWebpackPlugin(),
+    ],
+};
+
+module.exports = webpackConfig;
+```
+
+
+
+
+
+**Source Map**
+
+**3. webpack** **开发环境下的** **Source Map**
+
+在开发环境下，webpack 默认启用了 Source Map 功能。当程序运行出错时，可以直接在控制台提示错误行
+
+的位置，并定位到具体的源代码：
+
+**3.1 默认 Source Map 的问题**
+
+开发环境下默认生成的 Source Map，记录的是生成后的代码的位置。会导致运行时报错的行数与源代码的行
+
+数不一致的问题。示意图如下：
+
+**3.2 解决默认 Source Map 的问题**
+
+开发环境下，推荐在 webpack.config.js 中添加如下的配置，即可保证运行时报错的行数与源代码的行数
+
+保持一致：
+
+```js
+module.exports = {
+  mode: 'development',
+  //eval-source-map 仅限在“开发模式”下使用，不建议在“生产模式”下使用。
+  //此选项生成的Source Map 能保证 “运行时报错的行数” 与 “源代码的行数” 保持一致
+  devtool: 'eval-source-map',
+}
+```
+
+**5. Source Map 的最佳实践**
+
+① 开发环境下： 
+
+​	devtool 设置为 eval-source-map
+
+②生产环境
+
+​	devtool 设置为 nosources-source-map
+
+注意： 不建议使用devtool: source-map
+
+
+
